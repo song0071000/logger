@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"time"
@@ -72,10 +73,13 @@ func SetLogger(config ...Config) gin.HandlerFunc {
 				msg = c.Errors.String()
 			}
 
+			postParams, _ := ioutil.ReadAll(c.Request.Body)
+
 			dumplogger := sublog.With().
 				Int("status", c.Writer.Status()).
 				Str("method", c.Request.Method).
 				Str("path", path).
+				Str("post-param", string(postParams)).
 				Str("ip", c.ClientIP()).
 				Dur("latency", latency).
 				Str("user-agent", c.Request.UserAgent()).
